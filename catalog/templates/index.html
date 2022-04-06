@@ -1,0 +1,17 @@
+{% extends 'base_generic.html' %}
+
+{% block title %} <title>Livraria Local | Home</title> {% endblock %}
+
+{% block content %}
+    <h1>Livraria Local</h1>
+    <p>Bem vindo a Livraria Local, um website desenvolvido por <em>Robson Leal</em>!</p>
+    <h2>Conteúdo Dinâmico</h2>
+    <p>A biblioteca tem as seguintes contagens de registros:</p>
+    <ul>
+        <li><strong>Livros:</strong> {{ num_books }}</li>
+        <li><strong>Cópias:</strong> {{ num_instances }}</li>
+        <li><strong>Copias disponíveis:</strong> {{ num_instances_available }}</li>
+        <li><strong>Gêneros:</strong> {{ num_genres }}</li>
+        <li><strong>Autores:</strong> {{ num_authors }}</li>
+    </ul>
+{% endblock %}
