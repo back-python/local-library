@@ -22,12 +22,16 @@ class Author(models.Model):
 
     date_of_death = models.DateField(
         verbose_name='Data do falecimento',
-        blank=False,
-        null=False
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.first_name} {self.last_name}'
+
+    class Meta:
+        verbose_name = 'Autor'
+        verbose_name_plural = 'Autores'
 
 
 class Genre(models.Model):
@@ -41,6 +45,10 @@ class Genre(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    class Meta:
+        verbose_name = 'Gênero'
+        verbose_name_plural = 'Gêneros'
+
 
 class Language(models.Model):
     name = models.CharField(
@@ -53,31 +61,29 @@ class Language(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    class Meta:
+        verbose_name = 'Linguagem'
+        verbose_name_plural = 'Linguagens'
+
 
 class Book(models.Model):
     title = models.CharField(
         max_length=255,
         unique=True,
-        verbose_name='Titulo',
+        verbose_name='Título',
         blank=False,
         null=False
     )
 
     author = models.ForeignKey(
         Author, 
+        verbose_name='Autor',
         on_delete=models.CASCADE
     )
 
     summary = models.TextField(
-        max_length=1000,
+        max_length=1500,
         verbose_name='Sumário',
-        blank=False,
-        null=False
-    )
-
-    imprint = models.CharField(
-        max_length=255,
-        verbose_name='Imprint',
         blank=False,
         null=False
     )
@@ -90,54 +96,67 @@ class Book(models.Model):
     )
 
     genre = models.ManyToManyField(
-        Genre, 
+        Genre,
+        verbose_name='Gênero'
     )
 
     language = models.ForeignKey(
-        Language, 
+        Language,
+        verbose_name='Linguagem',
         on_delete=models.CASCADE
     )
 
     def __str__(self):
         return f'{self.title}'
 
+    def display_genre(self):
+        """Create a string for the Genre. This is required to display_genre in Admin."""
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+
+    display_genre.short_description = 'Gênero'
 
     def get_absolute_url(self):
         return reverse('book-detail-view', args=[str(self.id)])
 
     class Meta:
         ordering = ['title']
-
+        verbose_name = 'Livro'
+        verbose_name_plural = 'Livros'
 
 
 class BookInstance(models.Model):
-    """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
+    """Model representing a specific copy of a book."""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
-        help_text='Unique ID for this particular book across whole library'
+        help_text='ID unica do livro, que representa ele na livraria'
     )
     
     book = models.ForeignKey(
         Book,
         on_delete=models.SET_NULL,
+        verbose_name='Título do Livro',
         null=True
     )
     
     imprint = models.CharField(
-        max_length=200
+        max_length=255,
+        verbose_name='Versão impressa',
+        blank=False,
+        null=False
     )
 
     due_back = models.DateField(
+        verbose_name='Data de devolução',
         null=True,
         blank=True
     )
 
     LOAN_STATUS = (
-        ('m', 'Maintenance'),
-        ('o', 'On loan'),
-        ('a', 'Available'),
-        ('r', 'Reserved'),
+        ('m', 'Manutenção'),
+        ('e', 'Emprestado'),
+        ('d', 'Disponivel'),
+        ('r', 'Reservado'),
     )
 
     status = models.CharField(
@@ -145,12 +164,14 @@ class BookInstance(models.Model):
         choices=LOAN_STATUS,
         blank=True,
         default='m',
-        help_text='Book availability',
+        help_text='Disponibilidade',
     )
-
-    class Meta:
-        ordering = ['due_back']
 
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.id} ({self.book.title})'
+
+    class Meta:
+        ordering = ['due_back']
+        verbose_name = 'Instância de um livro'
+        verbose_name_plural = 'Todas as instâncias'
