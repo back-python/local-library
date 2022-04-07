@@ -116,7 +116,7 @@ class Book(models.Model):
     display_genre.short_description = 'Gênero'
 
     def get_absolute_url(self):
-        return reverse('book-detail-view', args=[str(self.id)])
+        return reverse('book-detail', args=[str(self.id)])
 
     class Meta:
         ordering = ['title']

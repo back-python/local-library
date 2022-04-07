@@ -1,0 +1,19 @@
+{% extends 'base_generic.html' %}
+
+{% block title %} <title>Livraria Local | Livros</title> {% endblock %}
+
+{% block content %}
+<h1>Livraria Local</h1>
+{% if book_list %}
+<p>A biblioteca tem os seguintes livros:</p>
+<ul>
+    {% for book in book_list %}
+    <li><strong>{{ forloop.counter }} -</strong>
+        <a href="{{ book.get_absolute_url }}">{{ book.title | slice:':30' }}</a> ({{ book.author }})
+    </li> 
+    {% endfor %}
+</ul>
+{% else %}
+<p>A biblioteca não possui livros cadastrados.</p>
+{% endif %}
+{% endblock %}
